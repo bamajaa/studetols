@@ -3,109 +3,419 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - STUDETOLS</title>
-    <!-- Font Profesional (Inter) -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Icon Set (FontAwesome) -->
+    <title>Dashboard - STUDETOLS Control Center</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
+        /* ==========================================================================
+           DESIGN SYSTEM & VARIABLES
+           ========================================================================== */
         :root {
-            --primary: #4f46e5;
-            --bg-color: #f8fafc;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
-            --border: #e2e8f0;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --primary-light: #EEF2FF;
+            --success: #059669;
+            --success-hover: #047857;
+            --success-light: #ECFDF5;
+            --bg-main: #F8FAFC;
+            --bg-surface: #FFFFFF;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border-color: #E2E8F0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
-        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
-        
-        /* HEADER NAVIGASI PROFIL */
-        .top-nav { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: white; border-bottom: 1px solid var(--border); margin-bottom: 40px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-        .brand-area { display: flex; align-items: center; gap: 12px; }
-        .logo-box { background: var(--primary); color: white; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 700; font-size: 18px; }
-        .brand-text h2 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
-        .brand-text span { font-size: 12px; color: var(--text-muted); }
-        .user-area { display: flex; align-items: center; gap: 20px; }
-        .user-badge { font-size: 14px; color: var(--primary); background: #eff6ff; padding: 8px 16px; border-radius: 20px; font-weight: 500; }
-        .btn-logout { color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
-        .btn-logout:hover { color: #b91c1c; }
 
-        /* KONTEN MENU UTAMA */
-        .header-title { text-align: left; width: 100%; max-width: 900px; margin-bottom: 30px; padding: 0 20px; }
-        .header-title h1 { font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
-        .header-title p { color: var(--text-muted); font-size: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; overflow-x: hidden; }
+        a { text-decoration: none; color: inherit; }
+        ul { list-style: none; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
 
-        .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; width: 100%; max-width: 900px; padding: 0 20px; }
-        
-        .app-card {
-            background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 30px 24px;
-            text-align: left; text-decoration: none; color: inherit;
-            transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-            display: flex; flex-direction: column;
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.8s ease forwards; }
+        .animate-fade-in-up { animation: fadeIn 1s ease forwards; animation-delay: 0.2s; opacity: 0; }
+
+        /* NAVBAR */
+        .navbar { position: fixed; top: 0; width: 100%; background-color: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid transparent; z-index: 1000; transition: var(--transition); }
+        .navbar.scrolled { border-bottom: 1px solid var(--border-color); box-shadow: var(--shadow-sm); background-color: rgba(255, 255, 255, 0.95); }
+        .nav-container { max-width: 1200px; margin: 0 auto; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { display: flex; align-items: center; gap: 12px; }
+        .logo-box { width: 40px; height: 40px; background: linear-gradient(135deg, var(--primary), #818CF8); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; border-radius: 10px; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+        .brand-text { display: flex; flex-direction: column; }
+        .brand-title { font-weight: 700; font-size: 1.1rem; letter-spacing: 0.5px; }
+        .brand-subtitle { font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+        .nav-menu { display: flex; gap: 24px; }
+        .nav-link { font-size: 0.95rem; color: var(--text-muted); font-weight: 500; transition: var(--transition); }
+        .nav-link:hover, .nav-link.active { color: var(--primary); }
+        .nav-right { display: flex; align-items: center; gap: 20px; }
+        .user-profile { display: flex; align-items: center; gap: 10px; }
+        .avatar { width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-color); }
+        .user-name { font-size: 0.9rem; font-weight: 600; color: var(--primary); background: var(--primary-light); padding: 6px 12px; border-radius: 20px;}
+        .btn-logout { background: transparent; border: 1px solid #FCA5A5; color: #DC2626; padding: 8px 16px; border-radius: 10px; font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 6px; }
+        .btn-logout:hover { background: #FEE2E2; border-color: #DC2626; }
+        .hamburger { display: none; background: none; border: none; font-size: 1.5rem; color: var(--text-main); cursor: pointer; }
+
+        /* HERO SECTION */
+        .hero { position: relative; padding: 140px 0 80px; background-color: var(--bg-surface); background-image: radial-gradient(var(--border-color) 1px, transparent 1px); background-size: 24px 24px; text-align: center; border-bottom: 1px solid var(--border-color); overflow: hidden; }
+        .hero-glow { position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 600px; height: 400px; background: radial-gradient(circle, rgba(79, 70, 229, 0.08) 0%, rgba(255,255,255,0) 70%); pointer-events: none; }
+        .hero-content { position: relative; z-index: 1; max-width: 800px; margin: 0 auto;}
+        .badge-welcome { display: inline-block; padding: 6px 16px; background-color: var(--primary-light); color: var(--primary); font-size: 0.85rem; font-weight: 600; border-radius: 20px; margin-bottom: 24px; }
+        .hero-title { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; color: var(--text-main); }
+        .hero-title .highlight { background: linear-gradient(135deg, var(--primary), #3B82F6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero-desc { font-size: 1.1rem; color: var(--text-muted); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
+        .hero-actions { display: flex; justify-content: center; gap: 16px; }
+
+        /* BUTTONS */
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 24px; font-size: 0.95rem; font-weight: 600; border-radius: 12px; cursor: pointer; transition: var(--transition); border: none; }
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(79, 70, 229, 0.4); }
+        .btn-success { background-color: var(--success); color: white; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
+        .btn-success:hover { background-color: var(--success-hover); transform: translateY(-2px); box-shadow: 0 6px 16px rgba(5, 150, 105, 0.4); }
+        .btn-secondary { background-color: white; color: var(--text-main); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .btn-secondary:hover { background-color: #F1F5F9; transform: translateY(-2px); }
+        .btn-outline { background-color: transparent; color: var(--text-main); border: 1px solid var(--border-color); }
+        .btn-outline:hover { background-color: var(--bg-main); }
+        .btn-full { width: 100%; }
+
+        /* QUICK STATS */
+        .stats-section { margin-top: -40px; position: relative; z-index: 10; margin-bottom: 60px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .stat-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-md); transition: var(--transition); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .stat-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .stat-icon.purple { background: var(--primary-light); color: var(--primary); }
+        .stat-icon.green { background: var(--success-light); color: var(--success); }
+        .stat-icon.blue { background: #DBEAFE; color: #2563EB; }
+        .stat-icon.emerald { background: #D1FAE5; color: #059669; }
+        .stat-info h3 { font-size: 1.25rem; font-weight: 700; }
+        .stat-info p { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* APPLICATIONS */
+        .applications-section { padding: 60px 24px; }
+        .section-header { margin-bottom: 40px; }
+        .section-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
+        .section-header p { color: var(--text-muted); font-size: 1.1rem; }
+        .app-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        .app-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; box-shadow: var(--shadow-sm); transition: var(--transition); display: flex; flex-direction: column; position: relative; overflow: hidden; }
+        .app-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, transparent); transition: var(--transition); }
+        .app-card:nth-child(1)::before { background: var(--success); }
+        .app-card:nth-child(2)::before { background: var(--primary); }
+        .app-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: transparent; }
+        .app-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .app-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .StudeBizz-icon { background: var(--success-light); color: var(--success); }
+        .TaskTracker-icon { background: var(--primary-light); color: var(--primary); }
+        .app-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-active { background-color: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
+        .app-card-body { flex-grow: 1; margin-bottom: 32px; text-align: left; }
+        .app-card-body h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
+        .app-card-body p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; }
+        .app-card-footer { display: flex; flex-direction: column; gap: 12px; }
+
+        /* HOW IT WORKS */
+        .how-it-works-section { background-color: var(--bg-surface); padding: 80px 0; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); }
+        .text-center { text-align: center; }
+        .steps-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; margin-top: 50px; }
+        .step-card { text-align: center; position: relative; }
+        .step-number { font-size: 3rem; font-weight: 800; color: var(--bg-main); -webkit-text-stroke: 1px var(--border-color); position: absolute; top: -30px; left: 50%; transform: translateX(-50%); z-index: 0; opacity: 0.5; }
+        .step-icon { width: 60px; height: 60px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 20px; position: relative; z-index: 1; box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3); }
+        .step-card h4 { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; }
+        .step-card p { font-size: 0.9rem; color: var(--text-muted); }
+
+        /* ABOUT */
+        .about-section { padding: 100px 24px; }
+        .about-content { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; background: var(--bg-surface); padding: 40px; border-radius: 24px; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        .about-text h2 { font-size: 2.2rem; font-weight: 800; margin-bottom: 24px; }
+        .about-text p { color: var(--text-muted); font-size: 1.05rem; margin-bottom: 16px; line-height: 1.7; }
+        .about-list { margin-top: 24px; }
+        .about-list li { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; font-weight: 600; color: var(--text-main); }
+        .about-list i { color: var(--success); font-size: 1.2rem; }
+        .visual-box { width: 100%; aspect-ratio: 1; background: linear-gradient(135deg, var(--primary-light), #E0E7FF); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 8rem; color: var(--primary); box-shadow: inset 0 0 40px rgba(255,255,255,0.5); }
+
+        /* FOOTER */
+        .footer { background-color: #0F172A; color: white; padding: 60px 0 30px; }
+        .footer-top { display: flex; flex-direction: column; align-items: center; text-align: center; margin-bottom: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .footer-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+        .footer-tagline { color: #94A3B8; font-size: 1.1rem; }
+        .footer-bottom { display: flex; justify-content: space-between; align-items: center; color: #94A3B8; font-size: 0.9rem; }
+
+        /* RESPONSIVE */
+        @media (max-width: 1024px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .about-content { grid-template-columns: 1fr; }
+            .visual-box { aspect-ratio: 2/1; font-size: 5rem; }
         }
-        .app-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1); }
-        
-        .icon-wrapper { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; color: #059669; background: #ecfdf5; }
-        .icon-task { color: var(--primary); background: #eff6ff; }
-        
-        .app-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #0f172a; }
-        .app-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; flex-grow: 1; }
-        
-        .btn-buka { width: 100%; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 14px; transition: 0.2s; }
-        .btn-kasir { background: #059669; color: white; }
-        .btn-kasir:hover { background: #047857; }
-        .btn-task { background: var(--primary); color: white; }
-        .btn-task:hover { background: #4338ca; }
-
-        @media(max-width: 600px) { .top-nav { flex-direction: column; gap: 15px; text-align: center; } .user-area { flex-direction: column; gap: 10px; } }
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .hamburger { display: block; }
+            .nav-right .user-name { display: none; }
+            .hero-title { font-size: 2.2rem; }
+            .app-grid { grid-template-columns: 1fr; }
+            .steps-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+        }
+        @media (max-width: 480px) {
+            .hero { padding: 120px 0 60px; }
+            .hero-title { font-size: 1.8rem; }
+            .hero-desc { font-size: 0.95rem; }
+            .hero-actions { flex-direction: column; width: 100%; }
+            .stats-grid, .steps-grid { grid-template-columns: 1fr; }
+            .stats-section { margin-top: 0; padding: 0 24px; }
+            .about-content { padding: 24px; }
+            .about-text h2 { font-size: 1.6rem; }
+            .btn-logout { font-size: 0; padding: 8px 12px; }
+            .btn-logout i { font-size: 1rem; margin: 0; }
+        }
+        .nav-menu.active { display: flex; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background: white; padding: 20px; box-shadow: var(--shadow-md); border-top: 1px solid var(--border-color); }
     </style>
 </head>
 <body>
 
-    <!-- Header Atas -->
-    <div class="top-nav">
-        <div class="brand-area">
-            <div class="logo-box">ST</div>
-            <div class="brand-text">
-                <h2>STUDETOLS</h2>
-                <span>Control Center</span>
+    <!-- NAVBAR -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo-box">ST</div>
+                <div class="brand-text">
+                    <span class="brand-title">STUDETOLS</span>
+                    <span class="brand-subtitle">Control Center</span>
+                </div>
+            </div>
+            
+            <div class="nav-menu" id="navMenu">
+                <a href="#dashboard" class="nav-link active">Dashboard</a>
+                <a href="#aplikasi" class="nav-link">Aplikasi</a>
+                <a href="#panduan" class="nav-link">Panduan</a>
+                <a href="#tentang" class="nav-link">Tentang</a>
+            </div>
+
+            <div class="nav-right">
+                <div class="user-profile">
+                    <!-- Avatar statis -->
+                    <img src="https://ui-avatars.com/api/?name=User&background=4F46E5&color=fff" alt="User Avatar" class="avatar">
+                    
+                    <!-- ID ini SAMA PERSIS dengan kodemu sebelumnya (jangan diganti) -->
+                    <span class="user-name" id="userNameDisplay">Memuat...</span>
+                </div>
+                
+                <!-- Link Logout SAMA PERSIS dengan kodemu sebelumnya -->
+                <a href="/" class="btn-logout">
+                    <i class="fa-solid fa-power-off"></i> Keluar
+                </a>
+                
+                <button class="hamburger" id="hamburgerBtn">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
             </div>
         </div>
-        <div class="user-area">
-            <!-- Badge nama user dinamis -->
-            <span class="user-badge" id="userNameDisplay">Memuat...</span>
-            <a href="/" class="btn-logout"><i class="fa-solid fa-power-off"></i> Keluar</a>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <header class="hero" id="dashboard">
+        <div class="hero-glow"></div>
+        <div class="container hero-content animate-fade-in">
+            <span class="badge-welcome">👋 Selamat datang kembali</span>
+            <h1 class="hero-title">Kelola Semua Kebutuhan Produktivitasmu dalam <span class="highlight">Satu Tempat.</span></h1>
+            <p class="hero-desc">STUDETOLS Control Center memberikanmu akses cepat ke berbagai modul aplikasi untuk menunjang aktivitas harian dan bisnis personalmu dengan aman.</p>
+            <div class="hero-actions">
+                <a href="#aplikasi" class="btn btn-primary"><i class="fa-solid fa-rocket"></i> Buka Aplikasi</a>
+                <a href="#panduan" class="btn btn-secondary"><i class="fa-solid fa-book-open"></i> Lihat Panduan</a>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="header-title">
-        <h1>Pilih Aplikasi</h1>
-        <p>Akses modul produktivitas atau kasir personal Anda dengan aman.</p>
-    </div>
+    <!-- QUICK STATS SECTION -->
+    <section class="stats-section container animate-fade-in-up">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fa-solid fa-layer-group"></i></div>
+                <div class="stat-info">
+                    <h3>2 Modul</h3>
+                    <p>Aplikasi Aktif</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-list-check"></i></div>
+                <div class="stat-info">
+                    <h3>Aman</h3>
+                    <p>Database Lokal</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-bolt"></i></div>
+                <div class="stat-info">
+                    <h3>Fast</h3>
+                    <p>Performa Sistem</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon emerald"><i class="fa-solid fa-server"></i></div>
+                <div class="stat-info">
+                    <h3>Online</h3>
+                    <p>Status Server</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <!-- Pilihan Menu -->
-    <div class="app-grid">
+    <!-- APPLICATIONS SECTION -->
+    <section class="applications-section container" id="aplikasi">
+        <div class="section-header">
+            <h2>Semua Aplikasi</h2>
+            <p>Pilih aplikasi yang ingin kamu gunakan untuk mengelola aktivitasmu.</p>
+        </div>
+
+        <div class="app-grid">
+            <!-- App Card: Stude Bizz -->
+            <div class="app-card">
+                <div class="app-card-header">
+                    <div class="app-icon StudeBizz-icon">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <span class="app-badge badge-active">Aktif</span>
+                </div>
+                <div class="app-card-body">
+                    <h3>Stude Bizz</h3>
+                    <p>Kelola transaksi harian, produk makanan & minuman, omzet, serta laporan bisnis dengan autentikasi akun Anda.</p>
+                </div>
+                <div class="app-card-footer">
+                    <!-- LINK MENUJU APLIKASI SAMA PERSIS DENGAN KODEMU -->
+                    <a href="/kasir/index.html" class="btn btn-success btn-full">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Stude Bizz
+                    </a>
+                </div>
+            </div>
+
+            <!-- App Card: Task Tracker -->
+            <div class="app-card">
+                <div class="app-card-header">
+                    <div class="app-icon TaskTracker-icon">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <span class="app-badge badge-active">Aktif</span>
+                </div>
+                <div class="app-card-body">
+                    <h3>Task Tracker Profil</h3>
+                    <p>Daftar tugas dan manajemen proyek personal yang tersimpan otomatis di database terisolasi khusus akun Anda.</p>
+                </div>
+                <div class="app-card-footer">
+                    <!-- LINK MENUJU APLIKASI SAMA PERSIS DENGAN KODEMU -->
+                    <a href="/tasks/index.html" class="btn btn-primary btn-full">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Task Tracker
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- HOW IT WORKS SECTION -->
+    <section class="how-it-works-section" id="panduan">
+        <div class="container">
+            <div class="section-header text-center">
+                <h2>Cara Menggunakan STUDETOLS</h2>
+                <p>Alur kerja yang simpel dan dirancang khusus untuk efisiensi.</p>
+            </div>
+            
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">01</div>
+                    <div class="step-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                    <h4>Login ke Akun</h4>
+                    <p>Autentikasi aman untuk mengakses dashboard pribadimu.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">02</div>
+                    <div class="step-icon"><i class="fa-solid fa-grip"></i></div>
+                    <h4>Pilih Aplikasi</h4>
+                    <p>Buka modul kasir atau pencatat tugas sesuai kebutuhan.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">03</div>
+                    <div class="step-icon"><i class="fa-solid fa-sliders"></i></div>
+                    <h4>Kelola Aktivitas</h4>
+                    <p>Mulai input data, transaksi, atau list tugas harianmu.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">04</div>
+                    <div class="step-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <h4>Pantau Hasilnya</h4>
+                    <p>Lihat laporan omzet dan progress tugas secara real-time.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about-section container" id="tentang">
+        <div class="about-content">
+            <div class="about-text">
+                <h2>Tentang STUDETOLS</h2>
+                <p><strong>STUDETOLS</strong> adalah platform yang dirancang eksklusif untuk membantu pelajar dan kreator dalam mengelola berbagai kebutuhan produktivitas dalam satu pusat kendali (Control Center).</p>
+                <p>Mulai dari manajemen proyek personal (Task Tracker) hingga simulasi pengelolaan bisnis kecil (Stude Bizz), sistem ini dibangun dengan arsitektur terisolasi sehingga setiap data pengguna aman dan tidak saling tumpang tindih.</p>
+                <ul class="about-list">
+                    <li><i class="fa-solid fa-check-circle"></i> Clean & Modern UI/UX</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Sistem Terintegrasi</li>
+                    <li><i class="fa-solid fa-check-circle"></i> Database Terisolasi</li>
+                </ul>
+            </div>
+            <div class="about-visual">
+                <div class="visual-box">
+                    <i class="fa-solid fa-laptop-code"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-top">
+                <div class="footer-brand">
+                    <div class="logo-box">ST</div>
+                    <span class="brand-title">STUDETOLS</span>
+                </div>
+                <p class="footer-tagline">Your personal productivity control center.</p>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 STUDETOLS. All rights reserved.</p>
+                <p class="creator">Dibuat oleh <strong>Ihsan Hafidz Assidiq</strong></p>
+                <p class="tech-stack">Built with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> using HTML, CSS, JS & SQLite</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPT TAMPILAN -->
+    <script>
+        // Animasi Sticky Navbar
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const hamburgerBtn = document.getElementById('hamburgerBtn');
+        const navMenu = document.getElementById('navMenu');
         
-        <!-- Mengarah ke halaman login/induk kasir -->
-        <a href="/kasir/index.html" class="app-card">
-            <div class="icon-wrapper"><i class="fa-solid fa-store"></i></div>
-            <h2>Stude Bizz</h2>
-            <p>Kelola transaksi harian, produk makanan & minuman, omzet, serta laporan bisnis dengan autentikasi akun Anda.</p>
-            <div class="btn-buka btn-kasir"><i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Stude Bizz</div>
-        </a>
+        hamburgerBtn.addEventListener('click', () => {
+            navMenu.classList.toggle('active');
+        });
+    </script>
 
-        <!-- Mengarah ke Task Tracker -->
-        <a href="/tasks/index.html" class="app-card">
-            <div class="icon-wrapper icon-task"><i class="fa-solid fa-list-check"></i></div>
-            <h2>Task Tracker Profil</h2>
-            <p>Daftar tugas dan manajemen proyek personal yang tersimpan otomatis di database terisolasi khusus akun Anda.</p>
-            <div class="btn-buka btn-task"><i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Task Tracker</div>
-        </a>
-    </div>
-
-    <!-- Script untuk menampilkan nama user aktif secara dinamis -->
-    <!-- Script untuk menampilkan nama akun login utama secara dinamis -->
-    <!-- Script untuk menampilkan nama profil aktif dari index.html -->
+    <!-- SCRIPT ASLI MILIKMU (DIBIARKAN SAMA PERSIS AGAR TIDAK RUSAK) -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const userNameDisplay = document.getElementById('userNameDisplay');
