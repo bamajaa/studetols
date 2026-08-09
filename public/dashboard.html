@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - STUDETOLS</title>
+    <!-- Font Profesional (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Icon Set (FontAwesome) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --bg-color: #f8fafc;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-main); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+        
+        /* HEADER NAVIGASI PROFIL */
+        .top-nav { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: white; border-bottom: 1px solid var(--border); margin-bottom: 40px; box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+        .brand-area { display: flex; align-items: center; gap: 12px; }
+        .logo-box { background: var(--primary); color: white; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; border-radius: 8px; font-weight: 700; font-size: 18px; }
+        .brand-text h2 { font-size: 16px; font-weight: 700; margin-bottom: 2px; }
+        .brand-text span { font-size: 12px; color: var(--text-muted); }
+        .user-area { display: flex; align-items: center; gap: 20px; }
+        .user-badge { font-size: 14px; color: var(--primary); background: #eff6ff; padding: 8px 16px; border-radius: 20px; font-weight: 500; }
+        .btn-logout { color: #ef4444; text-decoration: none; font-size: 14px; font-weight: 600; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .btn-logout:hover { color: #b91c1c; }
+
+        /* KONTEN MENU UTAMA */
+        .header-title { text-align: left; width: 100%; max-width: 900px; margin-bottom: 30px; padding: 0 20px; }
+        .header-title h1 { font-size: 28px; font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+        .header-title p { color: var(--text-muted); font-size: 15px; }
+
+        .app-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; width: 100%; max-width: 900px; padding: 0 20px; }
+        
+        .app-card {
+            background: #ffffff; border: 1px solid var(--border); border-radius: 12px; padding: 30px 24px;
+            text-align: left; text-decoration: none; color: inherit;
+            transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column;
+        }
+        .app-card:hover { transform: translateY(-4px); border-color: var(--primary); box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1); }
+        
+        .icon-wrapper { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 20px; color: #059669; background: #ecfdf5; }
+        .icon-task { color: var(--primary); background: #eff6ff; }
+        
+        .app-card h2 { font-size: 18px; font-weight: 600; margin-bottom: 10px; color: #0f172a; }
+        .app-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 24px; flex-grow: 1; }
+        
+        .btn-buka { width: 100%; padding: 12px; border-radius: 8px; text-align: center; font-weight: 600; font-size: 14px; transition: 0.2s; }
+        .btn-kasir { background: #059669; color: white; }
+        .btn-kasir:hover { background: #047857; }
+        .btn-task { background: var(--primary); color: white; }
+        .btn-task:hover { background: #4338ca; }
+
+        @media(max-width: 600px) { .top-nav { flex-direction: column; gap: 15px; text-align: center; } .user-area { flex-direction: column; gap: 10px; } }
+    </style>
+</head>
+<body>
+
+    <!-- Header Atas -->
+    <div class="top-nav">
+        <div class="brand-area">
+            <div class="logo-box">ST</div>
+            <div class="brand-text">
+                <h2>STUDETOLS</h2>
+                <span>Control Center</span>
+            </div>
+        </div>
+        <div class="user-area">
+            <!-- Badge nama user dinamis -->
+            <span class="user-badge" id="userNameDisplay">Memuat...</span>
+            <a href="/" class="btn-logout"><i class="fa-solid fa-power-off"></i> Keluar</a>
+        </div>
+    </div>
+
+    <div class="header-title">
+        <h1>Pilih Aplikasi</h1>
+        <p>Akses modul produktivitas atau kasir personal Anda dengan aman.</p>
+    </div>
+
+    <!-- Pilihan Menu -->
+    <div class="app-grid">
+        
+        <!-- Mengarah ke halaman login/induk kasir -->
+        <a href="/kasir/index.html" class="app-card">
+            <div class="icon-wrapper"><i class="fa-solid fa-store"></i></div>
+            <h2>Stude Bizz</h2>
+            <p>Kelola transaksi harian, produk makanan & minuman, omzet, serta laporan bisnis dengan autentikasi akun Anda.</p>
+            <div class="btn-buka btn-kasir"><i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Stude Bizz</div>
+        </a>
+
+        <!-- Mengarah ke Task Tracker -->
+        <a href="/tasks/index.html" class="app-card">
+            <div class="icon-wrapper icon-task"><i class="fa-solid fa-list-check"></i></div>
+            <h2>Task Tracker Profil</h2>
+            <p>Daftar tugas dan manajemen proyek personal yang tersimpan otomatis di database terisolasi khusus akun Anda.</p>
+            <div class="btn-buka btn-task"><i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Task Tracker</div>
+        </a>
+    </div>
+
+    <!-- Script untuk menampilkan nama user aktif secara dinamis -->
+    <!-- Script untuk menampilkan nama akun login utama secara dinamis -->
+    <!-- Script untuk menampilkan nama profil aktif dari index.html -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const userNameDisplay = document.getElementById('userNameDisplay');
+            
+            // Mengambil data dari key localStorage yang disimpan saat login di index.html
+            const profileName = localStorage.getItem('studetols_profile') || 'Pengguna';
+            const userRole = localStorage.getItem('studetols_role') || 'user';
+
+            if (userNameDisplay) {
+                userNameDisplay.textContent = `Halo, ${profileName} (${userRole})`;
+            }
+        });
+    </script>
+</body>
+</html>

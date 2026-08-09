@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Buat Akun - Stude Bizz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: #f8fafc; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+        }
+        .login-card { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); 
+            width: 100%; 
+            max-width: 400px; 
+            box-sizing: border-box;
+        }
+        .login-card h2 { 
+            text-align: center; 
+            margin-bottom: 20px; 
+            color: #0f172a; 
+            font-size: 24px; 
+        }
+
+        /* Tab Pilihan Mode */
+        .auth-tabs { 
+            display: flex; 
+            gap: 6px; 
+            margin-bottom: 24px; 
+            background: #f1f5f9; 
+            padding: 4px; 
+            border-radius: 8px; 
+        }
+        .tab-btn { 
+            flex: 1; 
+            padding: 10px; 
+            border: none; 
+            border-radius: 6px; 
+            font-weight: 600; 
+            font-size: 14px; 
+            cursor: pointer; 
+            background: transparent; 
+            color: #64748b; 
+            transition: all 0.2s ease; 
+        }
+        .tab-btn.active { 
+            background: #ffffff; 
+            color: #0f172a; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); 
+        }
+
+        .form-group { 
+            margin-bottom: 16px; 
+        }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-size: 14px; 
+            font-weight: 500; 
+            color: #475569; 
+        }
+        .form-group input { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 8px; 
+            font-size: 14px; 
+            outline: none; 
+            box-sizing: border-box; 
+        }
+        .form-group input:focus { 
+            border-color: #4f46e5; 
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); 
+        }
+        
+        .btn-submit { 
+            width: 100%; 
+            padding: 12px; 
+            background: #059669; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            margin-top: 10px; 
+            transition: background 0.2s; 
+        }
+        .btn-submit:hover { 
+            background: #047857; 
+        }
+        
+        .btn-back { 
+            display: block; 
+            text-align: center; 
+            margin-top: 20px; 
+            color: #64748b; 
+            text-decoration: none; 
+            font-size: 14px; 
+        }
+        .btn-back:hover { 
+            color: #0f172a; 
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h2><i class="fa-solid fa-store" style="color: #4f46e5;"></i> Akun Stude Bizz</h2>
+        
+        <!-- Tab Navigasi Mode -->
+        <div class="auth-tabs">
+            <button type="button" class="tab-btn active" id="btn-login-tab" onclick="switchTab('login')">Login</button>
+            <button type="button" class="tab-btn" id="btn-register-tab" onclick="switchTab('register')">Buat Akun</button>
+        </div>
+
+        <form id="loginForm">
+            <!-- Input Nama Toko (Hanya tampil saat mode Buat Akun) -->
+            <div class="form-group" id="storeNameGroup" style="display: none;">
+                <label>Nama Toko</label>
+                <input type="text" id="storeName" placeholder="Masukkan nama toko...">
+            </div>
+
+            <div class="form-group">
+                <label>Access Token</label>
+                <input type="password" id="accessToken" placeholder="Masukkan token..." required>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Masuk & Buka Toko</button>
+        </form>
+
+        <a href="../dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
+
+    <script src="js/login.js?v=2"></script>
+   
+</body>
+</html>
