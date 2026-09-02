@@ -105,15 +105,17 @@
         .section-header { margin-bottom: 40px; }
         .section-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
         .section-header p { color: var(--text-muted); font-size: 1.1rem; }
-        .app-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 30px; }
+        .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
         .app-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; box-shadow: var(--shadow-sm); transition: var(--transition); display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .app-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, transparent); transition: var(--transition); }
         .app-card:nth-child(1)::before { background: var(--success); }
-        .app-card:nth-child(2)::before { background: var(--primary); }
+        .app-card:nth-child(2)::before { background: #D97706; }
+        .app-card:nth-child(3)::before { background: var(--primary); }
         .app-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: transparent; }
         .app-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .app-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
         .StudeBizz-icon { background: var(--success-light); color: var(--success); }
+        .KalkulatorNilai-icon { background: #FEF3C7; color: #D97706; }
         .TaskTracker-icon { background: var(--primary-light); color: var(--primary); }
         .app-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-active { background-color: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
@@ -152,6 +154,7 @@
         /* RESPONSIVE */
         @media (max-width: 1024px) {
             .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .app-grid { grid-template-columns: repeat(2, 1fr); }
             .about-content { grid-template-columns: 1fr; }
             .visual-box { aspect-ratio: 2/1; font-size: 5rem; }
         }
@@ -201,14 +204,10 @@
 
             <div class="nav-right">
                 <div class="user-profile">
-                    <!-- Avatar statis -->
                     <img src="https://ui-avatars.com/api/?name=User&background=4F46E5&color=fff" alt="User Avatar" class="avatar">
-                    
-                    <!-- ID ini SAMA PERSIS dengan kodemu sebelumnya (jangan diganti) -->
                     <span class="user-name" id="userNameDisplay">Memuat...</span>
                 </div>
                 
-                <!-- Link Logout SAMA PERSIS dengan kodemu sebelumnya -->
                 <a href="/" class="btn-logout">
                     <i class="fa-solid fa-power-off"></i> Keluar
                 </a>
@@ -240,7 +239,7 @@
             <div class="stat-card">
                 <div class="stat-icon purple"><i class="fa-solid fa-layer-group"></i></div>
                 <div class="stat-info">
-                    <h3>2 Modul</h3>
+                    <h3>3 Modul</h3>
                     <p>Aplikasi Aktif</p>
                 </div>
             </div>
@@ -276,7 +275,7 @@
         </div>
 
         <div class="app-grid">
-            <!-- App Card: Stude Bizz -->
+            <!-- App Card 1: Stude Bizz -->
             <div class="app-card">
                 <div class="app-card-header">
                     <div class="app-icon StudeBizz-icon">
@@ -289,14 +288,32 @@
                     <p>Kelola transaksi harian, produk makanan & minuman, omzet, serta laporan bisnis dengan autentikasi akun Anda.</p>
                 </div>
                 <div class="app-card-footer">
-                    <!-- LINK MENUJU APLIKASI SAMA PERSIS DENGAN KODEMU -->
                     <a href="/kasir/index.html" class="btn btn-success btn-full">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Stude Bizz
                     </a>
                 </div>
             </div>
 
-            <!-- App Card: Task Tracker -->
+            <!-- App Card 2: Kalkulator Nilai -->
+            <div class="app-card">
+                <div class="app-card-header">
+                    <div class="app-icon KalkulatorNilai-icon">
+                        <i class="fa-solid fa-calculator"></i>
+                    </div>
+                    <span class="app-badge badge-active">Aktif</span>
+                </div>
+                <div class="app-card-body">
+                    <h3>Kalkulator Nilai</h3>
+                    <p>Hitung nilai akhir dari berbagai komponen penilaian, simulasikan target, dan simpan hasilnya ke akunmu.</p>
+                </div>
+                <div class="app-card-footer">
+                    <a href="/kalkulator/index.html" class="btn btn-full" style="background-color:#D97706; color:white; box-shadow: 0 4px 12px rgba(217, 119, 6, 0.3);">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Kalkulator Nilai
+                    </a>
+                </div>
+            </div>
+
+            <!-- App Card 3: Task Tracker -->
             <div class="app-card">
                 <div class="app-card-header">
                     <div class="app-icon TaskTracker-icon">
@@ -309,7 +326,6 @@
                     <p>Daftar tugas dan manajemen proyek personal yang tersimpan otomatis di database terisolasi khusus akun Anda.</p>
                 </div>
                 <div class="app-card-footer">
-                    <!-- LINK MENUJU APLIKASI SAMA PERSIS DENGAN KODEMU -->
                     <a href="/tasks/index.html" class="btn btn-primary btn-full">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Task Tracker
                     </a>
@@ -415,12 +431,11 @@
         });
     </script>
 
-    <!-- SCRIPT ASLI MILIKMU (DIBIARKAN SAMA PERSIS AGAR TIDAK RUSAK) -->
+    <!-- SCRIPT ASLI MILIKMU -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const userNameDisplay = document.getElementById('userNameDisplay');
             
-            // Mengambil data dari key localStorage yang disimpan saat login di index.html
             const profileName = localStorage.getItem('studetols_profile') || 'Pengguna';
             const userRole = localStorage.getItem('studetols_role') || 'user';
 

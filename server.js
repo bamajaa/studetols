@@ -19,6 +19,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/kasir', express.static(path.join(__dirname, 'public/kasir')));
 app.use('/tasks', express.static(path.join(__dirname, 'public/tasks')));
+app.use('/kalkulator', express.static(path.join(__dirname, 'public/kalkulator')));
 
 
 // ==========================================
@@ -179,6 +180,94 @@ app.post('/api/sales', authenticateToken, (req, res) => {
 
 app.delete('/api/sales/:id', authenticateToken, (req, res) => {
     db.run("DELETE FROM sales WHERE id = ?", [req.params.id], () => res.json({ success: true }));
+});
+
+// ==========================================
+// 3. BACKEND KALKULATOR NILAI API
+// ==========================================
+
+// GET semua mapel milik user (dipakai kalkulator utk reload & Statistik nanti)
+app.get('/api/grades', authenticateToken, (req, res) => {
+    db.all("SELECT * FROM grade_subjects WHERE user_id = ? ORDER BY updated_at DESC", [req.user.id], (err, subjects) => {
+        if (err) return res.status(500).json({ error: 'Gagal mengambil data' });
+        if (subjects.length === 0) return res.json([]);
+
+        const ids = subjects.map(s => s.id);
+        const placeholders = ids.map(() => '?').join(',');
+        db.all(`SELECT * FROM grade_components WHERE subject_id IN (${placeholders}) ORDER BY urutan ASC`, ids, (err2, components) => {
+            if (err2) return res.status(500).json({ error: 'Gagal mengambil komponen' });
+            const result = subjects.map(s => ({
+                ...s,
+                components: components.filter(c => c.subject_id === s.id)
+            }));
+            res.json(result);
+        });
+    });
+});
+
+// GET satu mapel spesifik (buat edit ulang)
+app.get('/api/grades/:id', authenticateToken, (req, res) => {
+    db.get("SELECT * FROM grade_subjects WHERE id = ? AND user_id = ?", [req.params.id, req.user.id], (err, subject) => {
+        if (err || !subject) return res.status(404).json({ error: 'Data tidak ditemukan' });
+        db.all("SELECT * FROM grade_components WHERE subject_id = ? ORDER BY urutan ASC", [subject.id], (err2, components) => {
+            res.json({ ...subject, components: components || [] });
+        });
+    });
+});
+
+// POST simpan/update nilai mapel (upsert berdasarkan nama mapel per user)
+app.post('/api/grades', authenticateToken, (req, res) => {
+    const { subject_name, mode, data_nilai } = req.body;
+
+    if (!subject_name || !Array.isArray(data_nilai) || data_nilai.length === 0) {
+        return res.status(400).json({ error: 'Nama mapel dan minimal 1 nilai wajib diisi' });
+    }
+
+    db.get("SELECT id FROM grade_subjects WHERE user_id = ? AND LOWER(subject_name) = LOWER(?)",
+    [req.user.id, subject_name], (err, existing) => {
+        if (err) return res.status(500).json({ error: 'Terjadi kesalahan pada server' });
+
+        const saveComponents = (subjectId) => {
+            db.run("DELETE FROM grade_components WHERE subject_id = ?", [subjectId], (errDel) => {
+                if (errDel) return res.status(500).json({ error: 'Gagal memperbarui komponen' });
+
+                const stmt = db.prepare("INSERT INTO grade_components (subject_id, name, score, weight, urutan) VALUES (?, ?, ?, ?, ?)");
+                data_nilai.forEach((c, idx) => {
+                    stmt.run([subjectId, c.name, c.score, c.weight, idx]);
+                });
+                stmt.finalize((errFin) => {
+                    if (errFin) return res.status(500).json({ error: 'Gagal menyimpan komponen' });
+                    res.json({ success: true, id: subjectId });
+                });
+            });
+        };
+
+        if (existing) {
+            db.run("UPDATE grade_subjects SET mode = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+            [mode || 'bobot', existing.id], (errUpd) => {
+                if (errUpd) return res.status(500).json({ error: 'Gagal memperbarui mapel' });
+                saveComponents(existing.id);
+            });
+        } else {
+            db.run("INSERT INTO grade_subjects (user_id, subject_name, mode) VALUES (?, ?, ?)",
+            [req.user.id, subject_name, mode || 'bobot'], function(errIns) {
+                if (errIns) return res.status(500).json({ error: 'Gagal menyimpan mapel' });
+                saveComponents(this.lastID);
+            });
+        }
+    });
+});
+
+// DELETE mapel
+app.delete('/api/grades/:id', authenticateToken, (req, res) => {
+    db.get("SELECT id FROM grade_subjects WHERE id = ? AND user_id = ?", [req.params.id, req.user.id], (err, subject) => {
+        if (!subject) return res.status(404).json({ error: 'Data tidak ditemukan' });
+        db.run("DELETE FROM grade_components WHERE subject_id = ?", [subject.id], () => {
+            db.run("DELETE FROM grade_subjects WHERE id = ?", [subject.id], () => {
+                res.json({ success: true });
+            });
+        });
+    });
 });
 
 // --- ADMIN API (Kelola User / Access Key) ---

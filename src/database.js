@@ -42,6 +42,27 @@ db.serialize(() => {
         FOREIGN KEY (report_id) REFERENCES daily_reports(id)
     )`);
 
+    // Tabel Mata Pelajaran (Kalkulator Nilai)
+db.run(`CREATE TABLE IF NOT EXISTS grade_subjects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL,
+    subject_name TEXT NOT NULL,
+    mode TEXT DEFAULT 'bobot', -- 'bobot' atau 'rata'
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+)`);
+
+// Tabel Komponen Nilai per Mapel
+db.run(`CREATE TABLE IF NOT EXISTS grade_components (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    subject_id INTEGER NOT NULL,
+    name TEXT NOT NULL,
+    score REAL,
+    weight REAL,
+    urutan INTEGER DEFAULT 0,
+    FOREIGN KEY (subject_id) REFERENCES grade_subjects(id)
+)`);
     // Buat Akun Admin Default (Bisa buat login Dashboard & Kasir)
     db.get("SELECT * FROM users WHERE username = 'admin'", [], (err, row) => {
         if (!row) {
