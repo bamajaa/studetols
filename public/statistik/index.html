@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Statistik Belajar - STUDETOLS</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --primary: #4F46E5;
+        --primary-light: #EEF2FF;
+        --accent: #0E7490;
+        --accent-light: #ECFEFF;
+        --accent-soft: #CFFAFE;
+        --success: #16A34A;
+        --success-light: #F0FDF4;
+        --danger: #DC2626;
+        --danger-light: #FEF2F2;
+        --text: #111827;
+        --muted: #6B7280;
+        --border: #E5E7EB;
+        --bg: #F8FAFC;
+        --card: #FFFFFF;
+        --radius: 16px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+        font-family: 'Segoe UI', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        line-height: 1.5;
+        padding-bottom: 60px;
+    }
+
+    /* ---------- Header ---------- */
+    .topbar {
+        background: var(--card);
+        border-bottom: 1px solid var(--border);
+        padding: 18px 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+    .brand { display: flex; align-items: center; gap: 14px; }
+    .brand-mark {
+        width: 44px; height: 44px; border-radius: 12px;
+        background: var(--accent); color: white;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 20px;
+    }
+    .brand-text h1 { font-size: 1.05rem; }
+    .brand-text span { font-size: 0.8rem; color: var(--muted); }
+    .topbar-actions { display: flex; align-items: center; gap: 12px; }
+    .back-link {
+        color: var(--muted); text-decoration: none; font-size: 0.9rem;
+        display: flex; align-items: center; gap: 6px;
+    }
+    .back-link:hover { color: var(--text); }
+    .logout-btn {
+        border: 1px solid var(--danger); color: var(--danger); background: white;
+        padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; cursor: pointer;
+    }
+
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 40px; }
+
+    .page-title { margin-bottom: 28px; }
+    .page-title h2 { font-size: 1.6rem; margin-bottom: 4px; }
+    .page-title p { color: var(--muted); font-size: 0.95rem; }
+
+    /* ---------- Ringkasan ---------- */
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 18px;
+        margin-bottom: 32px;
+    }
+    .summary-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 20px;
+    }
+    .summary-card .label { font-size: 0.8rem; color: var(--muted); margin-bottom: 8px; }
+    .summary-card .value { font-size: 1.35rem; font-weight: 700; }
+    .summary-card .sub { font-size: 0.8rem; color: var(--muted); margin-top: 4px; }
+    .summary-card.accent .value { color: var(--accent); }
+    .summary-card.good .value { color: var(--success); }
+    .summary-card.bad .value { color: var(--danger); }
+
+    /* ---------- Panel input ---------- */
+    .input-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-bottom: 32px;
+    }
+    .panel {
+        background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 24px;
+    }
+    .panel h3 { font-size: 1.05rem; margin-bottom: 4px; display: flex; align-items: center; gap: 8px; }
+    .panel h3 i { color: var(--accent); }
+    .panel .desc { font-size: 0.82rem; color: var(--muted); margin-bottom: 18px; }
+
+    .field { margin-bottom: 14px; }
+    .field label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; }
+    .field input, .field select {
+        width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px;
+        font-size: 0.9rem; background: white;
+    }
+    .field input:focus, .field select:focus { outline: 2px solid var(--accent); border-color: var(--accent); }
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+    .timer-display {
+        text-align: center; padding: 24px 0; font-size: 2.6rem; font-weight: 700;
+        color: var(--accent); font-variant-numeric: tabular-nums; letter-spacing: 1px;
+    }
+    .timer-buttons { display: flex; gap: 10px; }
+
+    .btn {
+        border: none; border-radius: 8px; padding: 11px 18px; font-size: 0.9rem; font-weight: 600;
+        cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        width: 100%; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.9; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-outline { background: white; border: 1px solid var(--border); color: var(--text); }
+
+    /* ---------- Grafik ---------- */
+    .chart-grid { display: grid; grid-template-columns: 1fr; gap: 20px; margin-bottom: 32px; }
+    .chart-grid.two-col { grid-template-columns: 1fr 1fr; }
+    .chart-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 24px;
+    }
+    .chart-card h3 { font-size: 1rem; margin-bottom: 2px; }
+    .chart-card .desc { font-size: 0.8rem; color: var(--muted); margin-bottom: 16px; }
+    .chart-holder { position: relative; height: 260px; }
+    .empty-note {
+        text-align: center; color: var(--muted); font-size: 0.85rem; padding: 40px 0;
+    }
+
+    /* ---------- Riwayat ---------- */
+    .history-card {
+        background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+        padding: 24px;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 8px; font-size: 0.85rem; border-bottom: 1px solid var(--border); }
+    th { color: var(--muted); font-weight: 600; font-size: 0.78rem; }
+    td.right, th.right { text-align: right; }
+    .tag {
+        display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.72rem;
+        background: var(--accent-soft); color: var(--accent);
+    }
+    .del-btn {
+        background: none; border: none; color: var(--danger); cursor: pointer; font-size: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+        .summary-grid { grid-template-columns: repeat(2, 1fr); }
+        .input-grid, .chart-grid.two-col { grid-template-columns: 1fr; }
+        .wrap { padding: 24px 18px; }
+        .topbar { padding: 16px 20px; }
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="brand">
+        <div class="brand-mark"><i class="fa-solid fa-chart-line"></i></div>
+        <div class="brand-text">
+            <h1>Statistik Belajar</h1>
+            <span>STUDETOLS</span>
+        </div>
+    </div>
+    <div class="topbar-actions">
+        <a href="/dashboard.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        <button class="logout-btn" onclick="logout()">Keluar</button>
+    </div>
+</div>
+
+<div class="wrap">
+
+    <div class="page-title">
+        <h2>Performa belajarmu</h2>
+        <p>Catat waktu belajar dan pantau nilai per mapel di satu tempat.</p>
+    </div>
+
+    <!-- Ringkasan -->
+    <div class="summary-grid" id="summaryGrid">
+        <div class="summary-card accent">
+            <div class="label">Total waktu belajar tercatat</div>
+            <div class="value" id="sumTotal">0 jam</div>
+        </div>
+        <div class="summary-card good">
+            <div class="label">Mapel paling kuat</div>
+            <div class="value" id="sumBest">-</div>
+            <div class="sub" id="sumBestSub">Belum ada data nilai</div>
+        </div>
+        <div class="summary-card bad">
+            <div class="label">Mapel perlu perhatian</div>
+            <div class="value" id="sumWorst">-</div>
+            <div class="sub" id="sumWorstSub">Belum ada data nilai</div>
+        </div>
+        <div class="summary-card">
+            <div class="label">Paling sering dipelajari</div>
+            <div class="value" id="sumMost">-</div>
+            <div class="sub" id="sumMostSub">Belum ada sesi belajar</div>
+        </div>
+    </div>
+
+    <!-- Timer & Input Manual -->
+    <div class="input-grid">
+        <div class="panel">
+            <h3><i class="fa-solid fa-stopwatch"></i> Timer Belajar</h3>
+            <p class="desc">Pilih mapel, tekan mulai saat mulai belajar, tekan berhenti saat selesai.</p>
+
+            <div class="field">
+                <label for="timerSubject">Mapel</label>
+                <input list="subjectOptions" id="timerSubject" placeholder="Contoh: Matematika">
+            </div>
+
+            <div class="timer-display" id="timerDisplay">00:00:00</div>
+
+            <div class="timer-buttons">
+                <button class="btn btn-accent" id="timerStartBtn" onclick="startTimer()">
+                    <i class="fa-solid fa-play"></i> Mulai
+                </button>
+                <button class="btn btn-danger" id="timerStopBtn" onclick="stopTimer()" disabled>
+                    <i class="fa-solid fa-stop"></i> Berhenti &amp; Simpan
+                </button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h3><i class="fa-solid fa-pen"></i> Input Manual</h3>
+            <p class="desc">Sudah selesai belajar tadi dan lupa nyalain timer? Catat manual di sini.</p>
+
+            <div class="field">
+                <label for="manualSubject">Mapel</label>
+                <input list="subjectOptions" id="manualSubject" placeholder="Contoh: Fisika">
+            </div>
+            <div class="field">
+                <label for="manualDate">Tanggal</label>
+                <input type="date" id="manualDate">
+            </div>
+            <div class="row-2">
+                <div class="field">
+                    <label for="manualHour">Jam</label>
+                    <input type="number" id="manualHour" min="0" value="0">
+                </div>
+                <div class="field">
+                    <label for="manualMinute">Menit</label>
+                    <input type="number" id="manualMinute" min="0" max="59" value="30">
+                </div>
+            </div>
+            <button class="btn btn-accent" onclick="submitManual()">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan Sesi Belajar
+            </button>
+        </div>
+    </div>
+
+    <datalist id="subjectOptions"></datalist>
+
+    <!-- Tren waktu belajar -->
+    <div class="chart-grid">
+        <div class="chart-card">
+            <h3>Tren waktu belajar harian</h3>
+            <p class="desc">Jumlah jam belajar dari hari ke hari.</p>
+            <div class="chart-holder"><canvas id="trendChart"></canvas></div>
+            <div class="empty-note" id="trendEmpty" style="display:none;">Belum ada sesi belajar yang tercatat.</div>
+        </div>
+    </div>
+
+    <!-- Perbandingan antar mapel -->
+    <div class="chart-grid two-col">
+        <div class="chart-card">
+            <h3>Nilai per mapel</h3>
+            <p class="desc">Diambil otomatis dari Kalkulator Nilai.</p>
+            <div class="chart-holder"><canvas id="gradeChart"></canvas></div>
+            <div class="empty-note" id="gradeEmpty" style="display:none;">Belum ada nilai tersimpan. Isi dulu di Kalkulator Nilai.</div>
+        </div>
+        <div class="chart-card">
+            <h3>Jam belajar per mapel</h3>
+            <p class="desc">Total waktu belajar yang tercatat per mapel.</p>
+            <div class="chart-holder"><canvas id="timeChart"></canvas></div>
+            <div class="empty-note" id="timeEmpty" style="display:none;">Belum ada sesi belajar yang tercatat.</div>
+        </div>
+    </div>
+
+    <!-- Riwayat -->
+    <div class="history-card">
+        <h3 style="margin-bottom: 16px;">Riwayat sesi belajar</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tanggal</th>
+                    <th>Mapel</th>
+                    <th>Sumber</th>
+                    <th class="right">Durasi</th>
+                    <th class="right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody">
+                <tr><td colspan="5" style="text-align:center; color: var(--muted);">Memuat...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+const API = '';
+const token = localStorage.getItem('studetols_token');
+if (!token) {
+    window.location.href = '/';
+}
+const authHeaders = { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' };
+
+function logout() {
+    localStorage.removeItem('studetols_token');
+    localStorage.removeItem('studetols_profile');
+    localStorage.removeItem('studetols_role');
+    window.location.href = '/';
+}
+
+function formatMinutes(mins) {
+    const h = Math.floor(mins / 60);
+    const m = Math.round(mins % 60);
+    if (h === 0) return `${m} menit`;
+    if (m === 0) return `${h} jam`;
+    return `${h} jam ${m} menit`;
+}
+
+// ---------- Timer ----------
+let timerInterval = null;
+let timerSeconds = 0;
+
+function startTimer() {
+    const subject = document.getElementById('timerSubject').value.trim();
+    if (!subject) { alert('Isi nama mapel dulu ya.'); return; }
+
+    timerSeconds = 0;
+    document.getElementById('timerStartBtn').disabled = true;
+    document.getElementById('timerStopBtn').disabled = false;
+    document.getElementById('timerSubject').disabled = true;
+
+    timerInterval = setInterval(() => {
+        timerSeconds++;
+        const h = String(Math.floor(timerSeconds / 3600)).padStart(2, '0');
+        const m = String(Math.floor((timerSeconds % 3600) / 60)).padStart(2, '0');
+        const s = String(timerSeconds % 60).padStart(2, '0');
+        document.getElementById('timerDisplay').textContent = `${h}:${m}:${s}`;
+    }, 1000);
+}
+
+async function stopTimer() {
+    clearInterval(timerInterval);
+    const subject = document.getElementById('timerSubject').value.trim();
+    const durationMinutes = Math.max(1, Math.round(timerSeconds / 60));
+
+    document.getElementById('timerStartBtn').disabled = false;
+    document.getElementById('timerStopBtn').disabled = true;
+    document.getElementById('timerSubject').disabled = false;
+    document.getElementById('timerDisplay').textContent = '00:00:00';
+    timerSeconds = 0;
+
+    await saveSession(subject, durationMinutes, todayStr(), 'timer');
+}
+
+// ---------- Input manual ----------
+function todayStr() {
+    const d = new Date();
+    return d.toISOString().split('T')[0];
+}
+document.getElementById('manualDate').value = todayStr();
+
+async function submitManual() {
+    const subject = document.getElementById('manualSubject').value.trim();
+    const date = document.getElementById('manualDate').value;
+    const hour = parseInt(document.getElementById('manualHour').value) || 0;
+    const minute = parseInt(document.getElementById('manualMinute').value) || 0;
+    const totalMinutes = hour * 60 + minute;
+
+    if (!subject) { alert('Isi nama mapel dulu ya.'); return; }
+    if (!date) { alert('Pilih tanggal belajarnya.'); return; }
+    if (totalMinutes <= 0) { alert('Durasi belajar harus lebih dari 0 menit.'); return; }
+
+    await saveSession(subject, totalMinutes, date, 'manual');
+    document.getElementById('manualSubject').value = '';
+    document.getElementById('manualHour').value = 0;
+    document.getElementById('manualMinute').value = 30;
+}
+
+async function saveSession(subject_name, duration_minutes, date, source) {
+    try {
+        const res = await fetch('/api/study-sessions', {
+            method: 'POST',
+            headers: authHeaders,
+            body: JSON.stringify({ subject_name, duration_minutes, date, source })
+        });
+        const data = await res.json();
+        if (!res.ok) { alert(data.error || 'Gagal menyimpan sesi belajar'); return; }
+        await loadAll();
+    } catch (e) {
+        alert('Terjadi kesalahan koneksi ke server.');
+    }
+}
+
+async function deleteSession(id) {
+    if (!confirm('Hapus sesi belajar ini?')) return;
+    await fetch('/api/study-sessions/' + id, { method: 'DELETE', headers: authHeaders });
+    await loadAll();
+}
+
+// ---------- Load & render ----------
+let trendChartInstance, gradeChartInstance, timeChartInstance;
+
+async function loadSubjectOptions() {
+    try {
+        const res = await fetch('/api/grades/subjects-list', { headers: authHeaders });
+        const subjects = await res.json();
+        const datalist = document.getElementById('subjectOptions');
+        datalist.innerHTML = subjects.map(s => `<option value="${s}">`).join('');
+    } catch (e) { /* diamkan, bukan fatal */ }
+}
+
+async function loadHistory() {
+    const res = await fetch('/api/study-sessions', { headers: authHeaders });
+    const rows = await res.json();
+    const tbody = document.getElementById('historyBody');
+
+    if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color: var(--muted);">Belum ada sesi belajar. Yuk mulai catat!</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = rows.map(r => `
+        <tr>
+            <td>${r.date}</td>
+            <td>${r.subject_name}</td>
+            <td><span class="tag">${r.source === 'timer' ? 'Timer' : 'Manual'}</span></td>
+            <td class="right">${formatMinutes(r.duration_minutes)}</td>
+            <td class="right"><button class="del-btn" onclick="deleteSession(${r.id})"><i class="fa-solid fa-trash"></i></button></td>
+        </tr>
+    `).join('');
+}
+
+async function loadSummary() {
+    const res = await fetch('/api/statistics/summary', { headers: authHeaders });
+    const data = await res.json();
+
+    // Ringkasan
+    document.getElementById('sumTotal').textContent = formatMinutes(data.total_minutes);
+
+    if (data.insight.best_subject) {
+        document.getElementById('sumBest').textContent = data.insight.best_subject.subject_name;
+        document.getElementById('sumBestSub').textContent = `Nilai ${data.insight.best_subject.nilai_akhir}`;
+    }
+    if (data.insight.worst_subject) {
+        document.getElementById('sumWorst').textContent = data.insight.worst_subject.subject_name;
+        document.getElementById('sumWorstSub').textContent = `Nilai ${data.insight.worst_subject.nilai_akhir}`;
+    }
+    if (data.insight.most_studied) {
+        document.getElementById('sumMost').textContent = data.insight.most_studied.subject_name;
+        document.getElementById('sumMostSub').textContent = formatMinutes(data.insight.most_studied.total_minutes);
+    }
+
+    // Trend chart (garis)
+    const trendEmpty = document.getElementById('trendEmpty');
+    if (data.daily.length === 0) {
+        trendEmpty.style.display = 'block';
+    } else {
+        trendEmpty.style.display = 'none';
+        const ctx = document.getElementById('trendChart');
+        if (trendChartInstance) trendChartInstance.destroy();
+        trendChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.daily.map(d => d.date),
+                datasets: [{
+                    label: 'Jam belajar',
+                    data: data.daily.map(d => Math.round((d.total_minutes / 60) * 10) / 10),
+                    borderColor: '#0E7490',
+                    backgroundColor: 'rgba(14, 116, 144, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Jam' } } }
+            }
+        });
+    }
+
+    // Grade chart (bar)
+    const gradeSubjects = data.by_subject.filter(s => s.nilai_akhir !== null);
+    const gradeEmpty = document.getElementById('gradeEmpty');
+    if (gradeSubjects.length === 0) {
+        gradeEmpty.style.display = 'block';
+    } else {
+        gradeEmpty.style.display = 'none';
+        const ctx = document.getElementById('gradeChart');
+        if (gradeChartInstance) gradeChartInstance.destroy();
+        gradeChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: gradeSubjects.map(s => s.subject_name),
+                datasets: [{
+                    label: 'Nilai akhir',
+                    data: gradeSubjects.map(s => s.nilai_akhir),
+                    backgroundColor: '#4F46E5',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, max: 100 } }
+            }
+        });
+    }
+
+    // Time chart (bar)
+    const timeSubjects = data.by_subject.filter(s => s.total_minutes > 0);
+    const timeEmpty = document.getElementById('timeEmpty');
+    if (timeSubjects.length === 0) {
+        timeEmpty.style.display = 'block';
+    } else {
+        timeEmpty.style.display = 'none';
+        const ctx = document.getElementById('timeChart');
+        if (timeChartInstance) timeChartInstance.destroy();
+        timeChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: timeSubjects.map(s => s.subject_name),
+                datasets: [{
+                    label: 'Jam belajar',
+                    data: timeSubjects.map(s => Math.round((s.total_minutes / 60) * 10) / 10),
+                    backgroundColor: '#0E7490',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'Jam' } } }
+            }
+        });
+    }
+}
+
+async function loadAll() {
+    await Promise.all([loadSubjectOptions(), loadHistory(), loadSummary()]);
+}
+
+loadAll();
+</script>
+
+</body>
+</html>

@@ -105,17 +105,19 @@
         .section-header { margin-bottom: 40px; }
         .section-header h2 { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
         .section-header p { color: var(--text-muted); font-size: 1.1rem; }
-        .app-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
+        .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 30px; }
         .app-card { background: var(--bg-surface); border: 1px solid var(--border-color); border-radius: 20px; padding: 32px; box-shadow: var(--shadow-sm); transition: var(--transition); display: flex; flex-direction: column; position: relative; overflow: hidden; }
         .app-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, transparent, transparent); transition: var(--transition); }
         .app-card:nth-child(1)::before { background: var(--success); }
         .app-card:nth-child(2)::before { background: #D97706; }
+        .app-card:nth-child(4)::before { background: #0E7490; }
         .app-card:nth-child(3)::before { background: var(--primary); }
         .app-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: transparent; }
         .app-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
         .app-icon { width: 64px; height: 64px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
         .StudeBizz-icon { background: var(--success-light); color: var(--success); }
         .KalkulatorNilai-icon { background: #FEF3C7; color: #D97706; }
+        .StatistikBelajar-icon { background: #CFFAFE; color: #0E7490; }
         .TaskTracker-icon { background: var(--primary-light); color: var(--primary); }
         .app-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .badge-active { background-color: #DCFCE7; color: #166534; border: 1px solid #BBF7D0; }
@@ -153,10 +155,12 @@
 
         /* RESPONSIVE */
         @media (max-width: 1024px) {
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .app-grid { grid-template-columns: repeat(2, 1fr); }
-            .about-content { grid-template-columns: 1fr; }
-            .visual-box { aspect-ratio: 2/1; font-size: 5rem; }
+           @media (max-width: 1024px) {
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .app-grid { grid-template-columns: repeat(2, 1fr); }
+    .about-content { grid-template-columns: 1fr; }
+    .visual-box { aspect-ratio: 2/1; font-size: 5rem; }
+}
         }
         @media (max-width: 768px) {
             .nav-menu { display: none; }
@@ -331,7 +335,26 @@
                     </a>
                 </div>
             </div>
+            <!-- App Card: Statistik Belajar -->
+    <div class="app-card">
+        <div class="app-card-header">
+            <div class="app-icon StatistikBelajar-icon">
+                <i class="fa-solid fa-chart-line"></i>
+            </div>
+            <span class="app-badge badge-active">Aktif</span>
         </div>
+        <div class="app-card-body">
+            <h3>Statistik Belajar</h3>
+            <p>Catat waktu belajar dan pantau tren performamu per mapel, lengkap dengan grafik.</p>
+        </div>
+        <div class="app-card-footer">
+            <a href="/statistik/index.html" class="btn btn-full" style="background-color:#0E7490; color:white; box-shadow: 0 4px 12px rgba(14, 116, 144, 0.3);">
+                <i class="fa-solid fa-arrow-right-to-bracket"></i> Buka Statistik Belajar
+            </a>
+        </div>
+    </div>
+        </div>
+
     </section>
 
     <!-- HOW IT WORKS SECTION -->
