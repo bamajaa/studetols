@@ -6,7 +6,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-10 pb-10 border-b border-slate-800">
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-400 text-white flex items-center justify-center font-bold text-sm">ST</div>
+            <img src="/logo.jpg" alt="STUDETOLS" className="w-9 h-9 rounded-lg shadow-sm object-cover" />
             <span className="font-bold text-lg tracking-wide">STUDETOLS</span>
           </div>
           <p className="text-slate-400 text-sm">Your personal productivity control center.</p>

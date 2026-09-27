@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
-import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, Coffee, Brain } from 'lucide-react';
+import { ArrowLeft, Play, Pause, RotateCcw, Volume2, VolumeX, Coffee, Brain, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function PomodoroPage() {
   const [mode, setMode] = useState<'focus' | 'break'>('focus');
@@ -15,8 +16,6 @@ export default function PomodoroPage() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const rainNodeRef = useRef<AudioBufferSourceNode | null>(null);
   const noiseNodeRef = useRef<AudioBufferSourceNode | null>(null);
-  const gainRainRef = useRef<GainNode | null>(null);
-  const gainNoiseRef = useRef<GainNode | null>(null);
 
   const getCtx = () => {
     if (!audioCtxRef.current) audioCtxRef.current = new AudioContext();
@@ -56,7 +55,7 @@ export default function PomodoroPage() {
     const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 400;
     src.connect(filter).connect(gain).connect(ctx.destination);
     src.start();
-    rainNodeRef.current = src; gainRainRef.current = gain;
+    rainNodeRef.current = src;
     setRainOn(true);
   };
 
@@ -69,7 +68,7 @@ export default function PomodoroPage() {
     const filter = ctx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = 1000;
     src.connect(filter).connect(gain).connect(ctx.destination);
     src.start();
-    noiseNodeRef.current = src; gainNoiseRef.current = gain;
+    noiseNodeRef.current = src;
     setNoiseOn(true);
   };
 
@@ -107,52 +106,186 @@ export default function PomodoroPage() {
 
   const mm = String(Math.floor(secLeft / 60)).padStart(2, '0');
   const ss = String(secLeft % 60).padStart(2, '0');
-  const progress = ((totalSec - secLeft) / totalSec) * 100;
+  
+  // Progress calculations
+  const progressRatio = (totalSec - secLeft) / totalSec;
+  const circumference = 2 * Math.PI * 120;
+  const strokeDashoffset = circumference - progressRatio * circumference;
 
   return (
     <PageWrapper>
-      <div className="max-w-lg mx-auto px-6 py-8">
-        <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6"><ArrowLeft size={16} /> Kembali</Link>
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Pomodoro Timer</h1>
-        <p className="text-slate-500 mb-8">Fokus belajar dengan teknik Pomodoro.</p>
+      <div className="max-w-xl mx-auto px-6 py-8">
+        <Link to="/dashboard" className="inline-flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-800 mb-6">
+          <ArrowLeft size={14} /> Kembali ke Dashboard
+        </Link>
+        
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight">Pomodoro Focus Timer</h1>
+          <p className="text-xs text-slate-500 mt-1">Gunakan teknik interval fokus 25 menit untuk meningkatkan produktivitas belajar.</p>
+        </div>
 
-        <div className="bg-white border border-slate-200 rounded-2xl p-8">
-          <div className="flex justify-center gap-2 mb-8">
-            <button onClick={() => switchMode('focus')} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition ${mode === 'focus' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600'}`}><Brain size={16} /> Fokus</button>
-            <button onClick={() => switchMode('break')} className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition ${mode === 'break' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600'}`}><Coffee size={16} /> Istirahat</button>
+        <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm relative overflow-hidden">
+          {/* Animated Background Pulse Ring when Running */}
+          {running && (
+            <motion.div
+              initial={{ scale: 0.8, opacity: 0.3 }}
+              animate={{ scale: [1, 1.08, 1], opacity: [0.15, 0.35, 0.15] }}
+              transition={{ repeat: Infinity, duration: 3, ease: 'easeInOut' }}
+              className={`absolute -inset-10 rounded-full blur-3xl pointer-events-none ${
+                mode === 'focus' ? 'bg-rose-500/20' : 'bg-emerald-500/20'
+              }`}
+            />
+          )}
+
+          {/* Mode Switcher */}
+          <div className="flex justify-center gap-2 mb-8 relative z-10">
+            <button 
+              onClick={() => switchMode('focus')} 
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition shadow-sm ${
+                mode === 'focus' ? 'bg-rose-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <Brain size={15} /> Sesi Fokus (25m)
+            </button>
+            <button 
+              onClick={() => switchMode('break')} 
+              className={`flex items-center gap-2 px-5 py-2 rounded-xl text-xs font-bold transition shadow-sm ${
+                mode === 'break' ? 'bg-emerald-600 text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              <Coffee size={15} /> Istirahat (5m)
+            </button>
           </div>
 
-          <div className="text-center mb-8">
-            <div className={`text-7xl font-extrabold font-mono tracking-wider ${mode === 'focus' ? 'text-rose-600' : 'text-emerald-600'}`}>{mm}:{ss}</div>
+          {/* Circular SVG Progress Display */}
+          <div className="relative flex items-center justify-center my-4">
+            <svg className="w-64 h-64 -rotate-90 transform">
+              <circle
+                cx="128"
+                cy="128"
+                r="120"
+                stroke="currentColor"
+                strokeWidth="10"
+                className="text-slate-100"
+                fill="transparent"
+              />
+              <motion.circle
+                cx="128"
+                cy="128"
+                r="120"
+                stroke="currentColor"
+                strokeWidth="10"
+                className={mode === 'focus' ? 'text-rose-500' : 'text-emerald-500'}
+                fill="transparent"
+                strokeDasharray={circumference}
+                animate={{ strokeDashoffset }}
+                transition={{ duration: 0.8, ease: 'easeInOut' }}
+                strokeLinecap="round"
+              />
+            </svg>
+
+            {/* Time In Center */}
+            <div className="absolute text-center">
+              <motion.div 
+                key={`${mm}:${ss}`}
+                initial={{ scale: 0.96 }}
+                animate={{ scale: 1 }}
+                className={`text-6xl font-black font-mono tracking-tight ${
+                  mode === 'focus' ? 'text-slate-900' : 'text-emerald-600'
+                }`}
+              >
+                {mm}:{ss}
+              </motion.div>
+              <div className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">
+                {running ? (mode === 'focus' ? 'Fokus Berjalan...' : 'Waktu Istirahat') : 'Siap Mulai'}
+              </div>
+            </div>
           </div>
 
-          <div className="w-full bg-slate-100 rounded-full h-3 mb-8 overflow-hidden">
-            <div className={`h-full rounded-full transition-all duration-1000 ${mode === 'focus' ? 'bg-rose-500' : 'bg-emerald-500'}`} style={{ width: `${progress}%` }} />
-          </div>
-
-          <div className="flex gap-3 mb-8">
+          {/* Controls */}
+          <div className="flex gap-3 my-6 max-w-xs mx-auto">
             {!running ? (
-              <button onClick={start} disabled={secLeft === 0} className="flex-1 py-3 bg-slate-900 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2 disabled:opacity-40"><Play size={16} /> Mulai</button>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={start} 
+                disabled={secLeft === 0} 
+                className="flex-1 py-3 bg-slate-900 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md hover:bg-slate-800 disabled:opacity-40 transition"
+              >
+                <Play size={16} /> Mulai Fokus
+              </motion.button>
             ) : (
-              <button onClick={pause} className="flex-1 py-3 bg-amber-500 text-white font-semibold rounded-xl text-sm flex items-center justify-center gap-2"><Pause size={16} /> Jeda</button>
+              <motion.button 
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={pause} 
+                className="flex-1 py-3 bg-amber-500 text-white font-bold rounded-2xl text-xs flex items-center justify-center gap-2 shadow-md hover:bg-amber-600 transition"
+              >
+                <Pause size={16} /> Jeda Sesi
+              </motion.button>
             )}
-            <button onClick={reset} className="py-3 px-5 bg-slate-100 text-slate-700 font-semibold rounded-xl text-sm flex items-center gap-2"><RotateCcw size={16} /> Reset</button>
+            <motion.button 
+              whileTap={{ scale: 0.95 }}
+              onClick={reset} 
+              className="py-3 px-5 bg-slate-100 text-slate-700 font-bold rounded-2xl text-xs flex items-center gap-1.5 hover:bg-slate-200 transition"
+            >
+              <RotateCcw size={15} /> Reset
+            </motion.button>
           </div>
 
-          <div className="border-t border-slate-200 pt-6">
-            <h3 className="text-sm font-bold text-slate-700 mb-3">Suara Latar (Ambient)</h3>
-            <div className="flex gap-3">
-              <button onClick={toggleRain} className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition ${rainOn ? 'bg-sky-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                {rainOn ? <Volume2 size={16} /> : <VolumeX size={16} />} Hujan
+          {/* Interactive Ambient Sounds with Animated Waveform */}
+          <div className="border-t border-slate-100 pt-6 mt-4">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-500">
+                Suara Latar Penunjang Konsentrasi (Ambient)
+              </h3>
+              {(rainOn || noiseOn) && (
+                <div className="flex items-center gap-1">
+                  <span className="text-[10px] font-bold text-emerald-600">Audio Aktif</span>
+                  {/* Jumping Sound Wave bars */}
+                  <div className="flex items-end gap-0.5 h-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{ height: ['4px', '12px', '6px', '14px', '4px'] }}
+                        transition={{ repeat: Infinity, duration: 0.8, delay: i * 0.15 }}
+                        className="w-1 bg-emerald-500 rounded-full"
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <button 
+                onClick={toggleRain} 
+                className={`py-3 px-4 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition border ${
+                  rainOn 
+                    ? 'bg-sky-600 text-white border-sky-600 shadow-sm shadow-sky-600/20' 
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                {rainOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span>Suara Hujan (Rain)</span>
               </button>
-              <button onClick={toggleNoise} className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition ${noiseOn ? 'bg-violet-600 text-white' : 'bg-slate-100 text-slate-600'}`}>
-                {noiseOn ? <Volume2 size={16} /> : <VolumeX size={16} />} White Noise
+
+              <button 
+                onClick={toggleNoise} 
+                className={`py-3 px-4 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition border ${
+                  noiseOn 
+                    ? 'bg-violet-600 text-white border-violet-600 shadow-sm shadow-violet-600/20' 
+                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                {noiseOn ? <Volume2 size={16} /> : <VolumeX size={16} />}
+                <span>White Noise</span>
               </button>
             </div>
           </div>
 
-          <div className="text-center mt-6 text-sm text-slate-500">
-            Sesi selesai: <span className="font-bold text-slate-900">{completed}</span> pomodoro
+          <div className="text-center mt-6 pt-4 border-t border-slate-100 text-xs text-slate-400">
+            Sesi Pomodoro berhasil diselesaikan: <strong className="text-slate-800">{completed}</strong> sesi
           </div>
         </div>
       </div>

@@ -12,6 +12,11 @@ import PomodoroPage from './pages/PomodoroPage';
 import CornellNotesPage from './pages/CornellNotesPage';
 import BookmarkPage from './pages/BookmarkPage';
 import SchedulePage from './pages/SchedulePage';
+import FinancePage from './pages/FinancePage';
+import CitationPage from './pages/CitationPage';
+import UnitConverterPage from './pages/UnitConverterPage';
+import ProfilePage from './pages/ProfilePage';
+import FriendsPage from './pages/FriendsPage';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -24,6 +29,8 @@ export default function App() {
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+      <Route path="/friends" element={<ProtectedRoute><FriendsPage /></ProtectedRoute>} />
       <Route path="/kasir" element={<ProtectedRoute><KasirLoginPage /></ProtectedRoute>} />
       <Route path="/kasir/app" element={<ProtectedRoute><KasirApp /></ProtectedRoute>} />
       <Route path="/kalkulator" element={<ProtectedRoute><KalkulatorNilaiPage /></ProtectedRoute>} />
@@ -34,6 +41,9 @@ export default function App() {
       <Route path="/cornell" element={<ProtectedRoute><CornellNotesPage /></ProtectedRoute>} />
       <Route path="/bookmarks" element={<ProtectedRoute><BookmarkPage /></ProtectedRoute>} />
       <Route path="/schedule" element={<ProtectedRoute><SchedulePage /></ProtectedRoute>} />
+      <Route path="/finance" element={<ProtectedRoute><FinancePage /></ProtectedRoute>} />
+      <Route path="/citation" element={<ProtectedRoute><CitationPage /></ProtectedRoute>} />
+      <Route path="/converter" element={<ProtectedRoute><UnitConverterPage /></ProtectedRoute>} />
     </Routes>
   );
 }

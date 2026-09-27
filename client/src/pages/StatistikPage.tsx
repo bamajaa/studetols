@@ -2,7 +2,23 @@ import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import PageWrapper from '../components/layout/PageWrapper';
 import { api } from '../api/client';
-import { ArrowLeft, Play, Square, Timer, Pen, Trash2, Save } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Play, 
+  Square, 
+  Timer, 
+  Pen, 
+  Trash2, 
+  Save, 
+  CheckCircle2, 
+  BookOpen, 
+  Layers, 
+  FileText, 
+  Bookmark, 
+  Users, 
+  Sparkles, 
+  TrendingUp 
+} from 'lucide-react';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, PointElement, LineElement, Title, Tooltip, Legend, Filler } from 'chart.js';
 import { Line, Bar } from 'react-chartjs-2';
 
@@ -13,6 +29,7 @@ const fmtMin = (m: number) => { const h = Math.floor(m / 60); const mm = Math.ro
 export default function StatistikPage() {
   const [sessions, setSessions] = useState<any[]>([]);
   const [summary, setSummary] = useState<any>(null);
+  const [overallStats, setOverallStats] = useState<any>(null);
   const [timerSubject, setTimerSubject] = useState('');
   const [timerSec, setTimerSec] = useState(0);
   const [running, setRunning] = useState(false);
@@ -23,8 +40,18 @@ export default function StatistikPage() {
   const [manualM, setManualM] = useState(30);
 
   const load = async () => {
-    const [s, sum] = await Promise.all([api.get('/api/study-sessions'), api.get('/api/statistics/summary')]);
-    setSessions(s); setSummary(sum);
+    try {
+      const [s, sum, ov] = await Promise.all([
+        api.get('/api/study-sessions'), 
+        api.get('/api/statistics/summary'),
+        api.get('/api/friends/my-stats')
+      ]);
+      setSessions(s); 
+      setSummary(sum);
+      if (ov && ov.stats) setOverallStats(ov.stats);
+    } catch (e) {
+      console.error(e);
+    }
   };
   useEffect(() => { load(); }, []);
 
@@ -59,8 +86,60 @@ export default function StatistikPage() {
     <PageWrapper>
       <div className="max-w-6xl mx-auto px-6 py-8">
         <Link to="/dashboard" className="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-700 mb-6"><ArrowLeft size={16} /> Kembali</Link>
-        <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Statistik Belajar</h1>
-        <p className="text-slate-500 mb-8">Catat waktu belajar dan pantau tren performamu.</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h1 className="text-2xl font-extrabold text-slate-900 mb-1">Statistik Belajar & Produktivitas</h1>
+            <p className="text-slate-500 text-xs sm:text-sm">Pantau tren performa akademik, sesi timer belajar, dan progres seluruh modul.</p>
+          </div>
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-2 px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-xl text-xs font-bold transition self-start sm:self-auto"
+          >
+            <Users size={14} />
+            <span>Lihat Statistik Teman</span>
+          </Link>
+        </div>
+
+        {/* Overview Stats Across Entire System */}
+        {overallStats && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+            <div className="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl p-4 text-white shadow-md">
+              <div className="flex items-center justify-between text-indigo-100 mb-2">
+                <span className="text-xs font-semibold">Tugas Terselesaikan</span>
+                <CheckCircle2 size={16} />
+              </div>
+              <div className="text-2xl font-black">{overallStats.completedTasks} <span className="text-xs font-normal text-indigo-200">/ {overallStats.totalTasks}</span></div>
+              <div className="text-[11px] text-indigo-200 mt-1">{overallStats.taskCompletionRate}% tingkat kepatuhan tugas</div>
+            </div>
+
+            <div className="bg-gradient-to-br from-teal-500 to-teal-600 rounded-2xl p-4 text-white shadow-md">
+              <div className="flex items-center justify-between text-teal-100 mb-2">
+                <span className="text-xs font-semibold">Sesi Waktu Belajar</span>
+                <Timer size={16} />
+              </div>
+              <div className="text-2xl font-black">{Math.round(overallStats.totalStudyMinutes / 60 * 10) / 10} <span className="text-xs font-normal text-teal-200">jam</span></div>
+              <div className="text-[11px] text-teal-200 mt-1">{overallStats.studySessions} total sesi tercatat</div>
+            </div>
+
+            <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl p-4 text-white shadow-md">
+              <div className="flex items-center justify-between text-purple-100 mb-2">
+                <span className="text-xs font-semibold">Flashcard & Hafalan</span>
+                <Layers size={16} />
+              </div>
+              <div className="text-2xl font-black">{overallStats.flashcardDecks} <span className="text-xs font-normal text-purple-200">Deck</span></div>
+              <div className="text-[11px] text-purple-200 mt-1">Metode repetisi aktif 3D</div>
+            </div>
+
+            <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-4 text-white shadow-md">
+              <div className="flex items-center justify-between text-amber-100 mb-2">
+                <span className="text-xs font-semibold">Cornell Notes</span>
+                <FileText size={16} />
+              </div>
+              <div className="text-2xl font-black">{overallStats.cornellNotes} <span className="text-xs font-normal text-amber-200">Catatan</span></div>
+              <div className="text-[11px] text-amber-200 mt-1">Tersimpan rapi di database</div>
+            </div>
+          </div>
+        )}
 
         {summary && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

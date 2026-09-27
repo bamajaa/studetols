@@ -20,6 +20,9 @@ const tables = [
     access_key VARCHAR(255) UNIQUE,
     role VARCHAR(50) NOT NULL,
     label VARCHAR(255),
+    avatar LONGTEXT,
+    bio TEXT,
+    favorite_subject VARCHAR(255),
     status VARCHAR(50) DEFAULT 'aktif',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`,
@@ -132,6 +135,40 @@ const tables = [
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   )`,
+  `CREATE TABLE IF NOT EXISTS finance_records (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    type VARCHAR(20) NOT NULL,
+    amount DECIMAL(12,2) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    description VARCHAR(255),
+    date VARCHAR(50) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  )`,
+  `CREATE TABLE IF NOT EXISTS friends (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    friend_id INT NOT NULL,
+    status VARCHAR(50) DEFAULT 'accepted',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_friendship (user_id, friend_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (friend_id) REFERENCES users(id) ON DELETE CASCADE
+  )`,
+  `CREATE TABLE IF NOT EXISTS direct_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    message TEXT NOT NULL,
+    is_read TINYINT DEFAULT 0,
+    deleted_by_sender TINYINT DEFAULT 0,
+    deleted_by_receiver TINYINT DEFAULT 0,
+    deleted_for_everyone TINYINT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+  )`,
 ];
 
 db.getConnection((err, connection) => {
@@ -153,6 +190,12 @@ db.getConnection((err, connection) => {
           "ALTER TABLE grade_subjects ADD COLUMN IF NOT EXISTS updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
           "ALTER TABLE grade_components ADD COLUMN IF NOT EXISTS name VARCHAR(255)",
           "ALTER TABLE grade_components ADD COLUMN IF NOT EXISTS urutan INT DEFAULT 0",
+          "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar LONGTEXT",
+          "ALTER TABLE users ADD COLUMN IF NOT EXISTS bio TEXT",
+          "ALTER TABLE users ADD COLUMN IF NOT EXISTS favorite_subject VARCHAR(255)",
+          "ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS deleted_by_sender TINYINT DEFAULT 0",
+          "ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS deleted_by_receiver TINYINT DEFAULT 0",
+          "ALTER TABLE direct_messages ADD COLUMN IF NOT EXISTS deleted_for_everyone TINYINT DEFAULT 0",
         ];
         migrations.forEach((mq) => db.query(mq, () => {}));
 
