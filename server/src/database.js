@@ -1,16 +1,23 @@
 const mysql = require("mysql2");
 require("dotenv").config();
 
-const db = mysql.createPool({
+const poolConfig = {
   host: process.env.DB_HOST || "localhost",
   user: process.env.DB_USER || "root",
   password: process.env.DB_PASSWORD || "",
   database: process.env.DB_NAME || "studetols",
+  port: process.env.DB_PORT ? Number(process.env.DB_PORT) : 3306,
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
   decimalNumbers: true,
-});
+};
+
+if (process.env.DB_SSL === "true" || (process.env.DB_HOST && process.env.DB_HOST !== "localhost" && process.env.DB_HOST !== "127.0.0.1")) {
+  poolConfig.ssl = { minVersion: "TLSv1.2", rejectUnauthorized: true };
+}
+
+const db = mysql.createPool(poolConfig);
 
 const tables = [
   `CREATE TABLE IF NOT EXISTS users (

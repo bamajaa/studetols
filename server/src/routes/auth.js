@@ -11,40 +11,47 @@ router.post("/login", (req, res) => {
     "SELECT * FROM users WHERE username = ? AND password = ?",
     [username, password],
     (err, results) => {
-      if (err) return res.status(500).json({ error: "Terjadi kesalahan server" });
+      if (err)
+        return res.status(500).json({ error: "Terjadi kesalahan server" });
       const user = results[0];
-      if (!user) return res.status(401).json({ error: "Username atau password salah!" });
-      if (user.status !== "aktif") return res.status(403).json({ error: "Akun ini sedang nonaktif!" });
+      if (!user)
+        return res.status(401).json({ error: "Username atau password salah!" });
+      if (user.status !== "aktif")
+        return res.status(403).json({ error: "Akun ini sedang nonaktif!" });
       const token = jwt.sign(
         { id: user.id, role: user.role, label: user.label || user.username },
         JWT_SECRET,
-        { expiresIn: "24h" }
+        { expiresIn: "24h" },
       );
-      res.json({ 
-        token, 
-        role: user.role, 
+      res.json({
+        token,
+        role: user.role,
         label: user.label || user.username,
         avatar: user.avatar || "",
         bio: user.bio || "",
-        favorite_subject: user.favorite_subject || ""
+        favorite_subject: user.favorite_subject || "",
       });
-    }
+    },
   );
 });
 
 router.post("/register", (req, res) => {
   const { username, password, label } = req.body;
   if (!username || !password)
-    return res.status(400).json({ error: "Username dan password wajib diisi!" });
+    return res
+      .status(400)
+      .json({ error: "Username dan password wajib diisi!" });
   const userLabel = label || username;
-  const accessKey = "KEY_" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  const accessKey =
+    "KEY_" + Math.random().toString(36).substring(2, 8).toUpperCase();
   db.query(
     "INSERT INTO users (username, password, access_key, role, label) VALUES (?, ?, ?, 'user', ?)",
     [username, password, accessKey, userLabel],
     (err, result) => {
-      if (err) return res.status(400).json({ error: "Username sudah digunakan!" });
+      if (err)
+        return res.status(400).json({ error: "Username sudah digunakan!" });
       res.json({ success: true, id: result.insertId });
-    }
+    },
   );
 });
 
@@ -54,10 +61,12 @@ router.get("/me", authenticateToken, (req, res) => {
     "SELECT id, username, role, label, avatar, bio, favorite_subject, created_at FROM users WHERE id = ?",
     [req.user.id],
     (err, results) => {
-      if (err) return res.status(500).json({ error: "Terjadi kesalahan server" });
-      if (!results[0]) return res.status(404).json({ error: "Pengguna tidak ditemukan" });
+      if (err)
+        return res.status(500).json({ error: "Terjadi kesalahan server" });
+      if (!results[0])
+        return res.status(404).json({ error: "Pengguna tidak ditemukan" });
       res.json(results[0]);
-    }
+    },
   );
 });
 
@@ -75,25 +84,34 @@ router.put("/profile", authenticateToken, (req, res) => {
     "SELECT id FROM users WHERE username = ? AND id != ?",
     [username, userId],
     (err, exists) => {
-      if (err) return res.status(500).json({ error: "Terjadi kesalahan server" });
+      if (err)
+        return res.status(500).json({ error: "Terjadi kesalahan server" });
       if (exists.length > 0) {
-        return res.status(400).json({ error: "Username sudah digunakan oleh akun lain!" });
+        return res
+          .status(400)
+          .json({ error: "Username sudah digunakan oleh akun lain!" });
       }
 
       db.query(
         "UPDATE users SET username = ?, label = ?, avatar = ?, bio = ?, favorite_subject = ? WHERE id = ?",
-        [username, label || username, avatar || "", bio || "", favorite_subject || "", userId],
+        [
+          username,
+          label || username,
+          avatar || "",
+          bio || "",
+          favorite_subject || "",
+          userId,
+        ],
         (updateErr) => {
           if (updateErr) {
             console.error("Update profile error:", updateErr);
             return res.status(500).json({ error: "Gagal memperbarui profil" });
           }
 
-          // Return fresh token with updated label
           const token = jwt.sign(
             { id: userId, role: req.user.role, label: label || username },
             JWT_SECRET,
-            { expiresIn: "24h" }
+            { expiresIn: "24h" },
           );
 
           res.json({
@@ -105,12 +123,12 @@ router.put("/profile", authenticateToken, (req, res) => {
               label: label || username,
               avatar: avatar || "",
               bio: bio || "",
-              favorite_subject: favorite_subject || ""
-            }
+              favorite_subject: favorite_subject || "",
+            },
           });
-        }
+        },
       );
-    }
+    },
   );
 });
 
