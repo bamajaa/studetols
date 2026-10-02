@@ -52,6 +52,12 @@ app.get("*", (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server STUDETOLS v2 aktif di http://localhost:${PORT}`);
-});
+// Export app for Vercel serverless
+module.exports = app;
+
+// Only listen locally (not on Vercel)
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`Server STUDETOLS v2 aktif di http://localhost:${PORT}`);
+  });
+}
