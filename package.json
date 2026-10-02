@@ -2,9 +2,15 @@
   "name": "studetols",
   "version": "1.0.0",
   "scripts": {
-    "build": "cd client && npm install && npm run build",
-    "start": "node server/src/index.js",
-    "install:server": "cd server && npm install"
+    "build": "echo Prebuilt assets ready",
+    "start": "node server/src/index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.11.0"
   },
   "engines": {
     "node": ">=18.0.0"

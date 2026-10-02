@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "cd client && npm install --foreground-scripts && npm run build && cd ../server && npm install --foreground-scripts",
   "outputDirectory": "client/dist",
   "functions": {
     "api/index.js": {
@@ -9,6 +8,7 @@
     }
   },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/index.js" }
+    { "source": "/api/(.*)", "destination": "/api/index.js" },
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
